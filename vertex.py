@@ -3,7 +3,7 @@ class Vertex(object):
     A vertex object representation.
     """
 
-    def __init__(self, id):
+    def __init__(self, id, data):
         """
         Initialize a vertex object with an id.
 
@@ -14,6 +14,7 @@ class Vertex(object):
             (Vertex): The initialized vertex object.
         """
         self.id = id
+        self.data = data
         self.neighbors = {}
 
     def add_neighbor(self, vertex, weight):
@@ -36,6 +37,9 @@ class Vertex(object):
             (string): The formatted string representation of this vertex.
         """
         return f'{self.id} adjacent to {[x.id for x in self.neighbors]}'
+
+    def to_dict(self):
+        return {"id": self.id, "data": self.data, "neighbors": self.neighbors}
 
     def get_neighbors(self, as_string=False):
         """

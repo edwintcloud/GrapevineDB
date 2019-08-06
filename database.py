@@ -2,6 +2,7 @@ from pickle import load, dump
 from pathlib import Path
 from datetime import datetime
 from functools import wraps
+from graph import Graph
 
 
 class Database:
@@ -55,10 +56,10 @@ class Database:
     @_save_on_update
     def add_collection(self, collection_name):
 
-        # collection name must be at least 6 characters
-        if len(collection_name) < 6:
+        # collection name must be at least 3 characters
+        if len(collection_name) < 3:
             raise Exception(
-                "collection name must be at least 6 characters in length"
+                "collection name must be at least 3 characters in length"
             )
 
         # collection must not already exist
@@ -66,14 +67,83 @@ class Database:
             raise Exception("collection already exists in database")
 
         # create the collection
-        self.db[collection_name] = {}
+        self.db[collection_name] = Graph()
 
     @_save_on_update
     def remove_collection(self, collection_name):
 
         # collection must exist in db
         if collection_name not in self.db:
-            raise Exception("collection not found in database")
+            raise Exception(
+                "collection {} not found in database".format(collection_name)
+            )
 
         # remove the collection
         del self.db[collection_name]
+
+    @_save_on_update
+    def insert(self, collection_name, data):
+
+        # collection must exist in db
+        if collection_name not in self.db:
+            raise Exception(
+                "collection {} not found in database".format(collection_name)
+            )
+
+        # add vertex to graph
+        try:
+            result = self.db[collection_name].add_vertex(data)
+            print(
+                "{}: Entry inserted into collection {} with id {}".format(
+                    self._current_dt, collection_name, result.id
+                )
+            )
+            return result.to_dict()
+        except Exception as e:
+            raise e
+
+    def get(self, collection_name, query):
+
+        # collection must exist in db
+        if collection_name not in self.db:
+            raise Exception(
+                "collection {} not found in database".format(collection_name)
+            )
+
+        try:
+            # if query is string, find by id
+            if isinstance(query, str):
+                return (
+                    self.db[collection_name].get_vertex_by_id(query).to_dict()
+                )
+        except Exception as e:
+            raise e
+
+    @_save_on_update
+    def associate(self, collection_name, id_1, id_2, label):
+        """
+        Add an edge associating one vertex to another. Label will be saved as
+        the weight of the edge.
+        """
+
+        # collection must exist in db
+        if collection_name not in self.db:
+            raise Exception(
+                "collection {} not found in database".format(collection_name)
+            )
+
+        # label must be at least 3 characters
+        if len(label) < 3:
+            raise Exception("label must be at least 3 characters in length")
+
+        try:
+            # create edge from id_1 to id_2 (order matters)
+            self.db[collection_name].add_edge(id_1, id_2, label)
+            print(
+                """{}: The association with label {} has been created from {} 
+                     to {} in collection {}""".format(
+                    self._current_dt, label, id_1, id_2, collection_name
+                )
+            )
+        except Exception as e:
+            raise e

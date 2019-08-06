@@ -2,6 +2,7 @@ from vertex import Vertex
 import random
 from queue import SimpleQueue, PriorityQueue
 from collections import defaultdict
+from uuid import uuid4
 
 
 class Graph(object):
@@ -9,13 +10,9 @@ class Graph(object):
     A graph object representation.
     """
 
-    def __init__(self, file_name=None):
+    def __init__(self):
         """
         Initialize a graph object.
-
-        Args:
-            file_name (string): The file name or file path to read in
-            a graph from.
 
         Returns:
             (Graph): The initialized graph object.
@@ -23,16 +20,16 @@ class Graph(object):
         self.vertices = {}
         self.num_vertices = 0
         self.num_edges = 0
-        self.type = "G"
 
-        # set find_path algorithm to alias find_shortest_path
-        self.find_path = self.find_shortest_path
+    @property
+    def num_associations(self):
+        return self.num_edges
 
-        # if file_name specified, read in graph from file
-        if file_name:
-            self._read_from_file(file_name)
+    @property
+    def num_nodes(self):
+        return self.num_vertices
 
-    def add_vertex(self, id):
+    def add_vertex(self, data):
         """
         Add a vertex to the graph by id and return the created vertex object.
 
@@ -42,12 +39,17 @@ class Graph(object):
         Returns:
             (Vertex): The vertex created.
         """
+        id = uuid4().hex
         if id not in self.vertices:
             self.num_vertices += 1
-            self.vertices[id] = Vertex(id)
+            self.vertices[id] = Vertex(id, data)
+        else:
+            raise Exception(
+                "fatal error: duplicate random hex generated for vertex uuid"
+            )
         return self.vertices[id]
 
-    def get_vertex(self, id):
+    def get_vertex_by_id(self, id):
         """
         Return a vertex by id.
 
@@ -68,10 +70,14 @@ class Graph(object):
             vtx_B (any): The end vertex in the edge.
             weight (any): The weight to be assigned to the edge.
         """
-        if self.get_vertex(vtx_A) is None:
-            self.add_vertex(vtx_A)
-        if self.get_vertex(vtx_B) is None:
-            self.add_vertex(vtx_B)
+        if (
+            self.get_vertex_by_id(vtx_A) is None
+            or self.get_vertex_by_id(vtx_B) is None
+        ):
+            raise Exception(
+                "unable to create edge, one or more vertices are missing\
+                    from the list of vertices"
+            )
         self.num_edges += 1
         self.vertices[vtx_A].add_neighbor(self.vertices[vtx_B], weight)
 
@@ -272,52 +278,3 @@ class Graph(object):
                     pq.put((dist, neighbor.id))
 
         return distances
-
-    def _read_from_file(self, file_name):
-        """
-        Read a graph from a file.
-
-        Args:
-            vtx_A (string): The file name or file path to read from.
-
-        Raises:
-            Exception: If input file is improperly formatted.
-        """
-
-        # load file specified
-        with open(file_name, 'r') as f:
-            file_lines = f.readlines()
-
-        # if less than 3 lines in file, throw error
-        if len(file_lines) < 3:
-            raise Exception("Expected input file to contain at least 3 lines.")
-
-        # set graph type
-        self.type = file_lines[0].strip()
-        if self.type != "G" and self.type != "D":
-            raise Exception(
-                f"Expected input file to have a type of G or D for line 1 \
-                but {self.type} was given."
-            )
-
-        # add graph vertices
-        for vtx in file_lines[1].strip().split(','):
-            self.add_vertex(vtx)
-
-        # add graph edges
-        for line in file_lines[2:]:
-            edge_spec = line.strip("() \n").split(',')
-            if len(edge_spec) != 3 and len(edge_spec) != 2:
-                raise Exception(
-                    "Expected input file edge specification to have 2 or 3 \
-                         items but {} was given.".format(
-                        line
-                    )
-                )
-            vtx1, vtx2 = edge_spec[:2]
-            weight = 1 if len(edge_spec) != 3 else int(edge_spec[2])
-            if self.type == "G":
-                self.add_edge(vtx1, vtx2, weight)
-                self.add_edge(vtx2, vtx1, weight)
-            else:
-                self.add_edge(vtx1, vtx2, weight)
