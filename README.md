@@ -10,6 +10,8 @@ The database will be modeled in the following way: A hash table of collections w
 
 As a v1 of this idea, the basic functionality will be tested via a cli test program and not be exposed for general usage.
 
+Finding all associations and commonalities will use a modified version of Dijkstra's. Finding associations will require finding all the neighbors with the same weight(label). Finding commonalities/differences will require finding all the neighbors with two different weights(labels) and finding the intersection or difference between these two sets of data. To display all of the associations for a single collection, we can use Prim's to generate a minimum spanning tree of the data.
+
 ## Resources
 
 - https://en.wikipedia.org/wiki/Graph_database#/media/File:GraphDatabase_PropertyGraph.png
