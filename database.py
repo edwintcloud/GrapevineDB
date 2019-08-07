@@ -102,7 +102,7 @@ class Database:
         except Exception as e:
             raise e
 
-    def get(self, collection_name, query):
+    def get(self, collection_name, query=None):
 
         # collection must exist in db
         if collection_name not in self.db:
@@ -116,6 +116,13 @@ class Database:
                 return (
                     self.db[collection_name].get_vertex_by_id(query).to_dict()
                 )
+            # if query is None, return all vertices in collection as a list
+            if query is None:
+                return [
+                    vertex.to_dict()
+                    for vertex in self.db[collection_name].vertices.values()
+                ]
+
         except Exception as e:
             raise e
 
