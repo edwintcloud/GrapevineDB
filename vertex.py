@@ -117,5 +117,5 @@ class Vertex(object):
                 # increment level
                 level += 1
 
-        # return result list of vertex ids
+        # return result
         return result
