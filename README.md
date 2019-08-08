@@ -27,7 +27,7 @@ Here are the problems I wish to solve with this project:
 - `db.remove("users", type="collection")` -> Remove _users_ collection from the database.
 - `db.wipe()` -> Remove all collections and nodes from the database.
 - `col.insert({"name": "basketball"})` -> Insert Node into collection with specified data. Returns a reference to the Node.
-- `node.relate_to(other_node, by="FRIENDS_OF", bidirectional=True)` -> Relate _node_ to _other_node_ and _other_node_ to node (if bidirectional is True) with the label _FRIENDS_OF_.
+- `node.relate_to(other_node, by="FRIENDS_OF", bidirectional=True)` -> Relate _node_ to _other_node_ and _other_node_ to _node_ (if bidirectional is _True_) with the label _FRIENDS_OF_.
 - `node.related_by("LIKES")` -> Return a list of nodes that are related to the node by label _LIKES_.
 - `node.related_difference("FRIENDS_OF", "LIKES")` -> Return a list of nodes that are related to the node directly by label _FRIENDS_OF_ and indirectly by label _LIKES_.
 
