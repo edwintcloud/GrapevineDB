@@ -1,22 +1,19 @@
 from queue import SimpleQueue
 
 
-class Vertex(object):
-    """
-    A vertex object representation.
-    """
-
-    def __init__(self, id, data):
+class Node(object):
+    def __init__(self, uuid, data):
         """
-        Initialize a vertex object with an id.
+        Initialize a node object with an uuid and data.
 
         Args:
-            id (any): The id of the vertex to be created.
+            uuid (str): The uuid of the node to be created.
+            data (dict): The data to be assigned to the node
 
         Returns:
-            (Vertex): The initialized vertex object.
+            (Node): The initialized Node object.
         """
-        self.id = id
+        self.id = uuid
         self.data = data
         self.neighbors = {}
 
@@ -95,7 +92,7 @@ class Vertex(object):
         # initialize queue with self
         queue.put(self)
 
-        # while there are vertices in the stack
+        # while there are vertices in the queue
         while queue.qsize() > 0:
             # dequeue a vertex
             vtx = queue.get()
@@ -119,3 +116,39 @@ class Vertex(object):
 
         # return result
         return result
+
+    # def depth_to(self, vtx):
+    #     """
+    #     Find the level of relation from this vertex to another.
+    #     """
+
+    #     # create needed structures
+    #     result = {}
+    #     visited = set([self])
+    #     stack = [self]
+    #     level = 1
+
+    #     # while there are vertices in the stack
+    #     while stack:
+    #         # dequeue a vertex
+    #         vtx = stack.pop()
+    #         # if the vertex has not been visited
+    #         if vtx not in visited:
+    #             # add it to visited set
+    #             visited.add(vtx)
+    #             # iterate through its neighbors
+    #             for neighbor in vtx.get_neighbors():
+    #                 # put the neighbor in the queue
+    #                 queue.put(neighbor)
+    #                 # if the weight of the edge from vtx to neighbor
+    #                 # matches label, add to result
+    #                 if vtx.get_edge_weight(neighbor) == label:
+    #                     if level in result:
+    #                         result[level].append(neighbor)
+    #                     else:
+    #                         result[level] = [neighbor]
+    #             # increment level
+    #             level += 1
+
+    #     # return result
+    #     return result

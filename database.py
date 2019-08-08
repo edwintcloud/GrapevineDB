@@ -1,60 +1,74 @@
-from pickle import load, dump
-from pathlib import Path
-from datetime import datetime
-from functools import wraps
-from graph import Graph
+from collection import Collection
+from uuid import uuid4
+from node import Node
+from queue import SimpleQueue
 
 
 class Database:
-    def __init__(self, db_file="data/db.p"):
-        self.db_path = Path(db_file)
-        self.db = {}
-        try:
-            # if database file exists, load it into memory
-            if self.db_path.exists():
-                self.db = load(self.db_path.open(mode="rb"))
-                print(f"{self._current_dt}: Database loaded from file!")
-            # otherwise, create the db file
-            else:
-                self.db_path.parent.mkdir()
-                self.db_path.touch()
-                dump(self.db, self.db_path.open(mode="wb"))
-                print(f"{self._current_dt}: Database created!")
-        except Exception as e:
-            print(e)
+    def __init__(self):
+        self.nodes = {}
+        self.collections = {}
 
     def __str__(self):
-        return str(self.db)
-
-    def __iter__(self):
-        return iter(self.db.items())
+        collections = [
+            f"\n\t{k}: {{\n\t\t{str(v)}\n\t}}"
+            for k, v in self.collections.items()
+        ]
+        nodes = [
+            f"\n\t{k}: {{\n\t\t{str(v)}\n\t}}" for k, v in self.nodes.items()
+        ]
+        return "{{\ncollections: {{\n{}\n}}, \nnodes: {{\n{}\n}}\n}}".format(
+            ",".join(collections), ",".join(nodes)
+        )
 
     @property
-    def collections(self):
-        return list(self.db.keys())
+    def num_nodes(self):
+        return len(self.nodes) + sum(
+            len(c.nodes) for c in self.collections.values()
+        )
 
     @property
-    def _current_dt(self):
-        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def num_associations(self):
+        return sum(len(i) for i in self.associations.values())
 
-    # pylint: disable=no-self-argument,not-callable,no-member
-    def _save_on_update(f):
-        @wraps(f)
-        def wrapper(self, *args, **kwargs):
-            result = f(self, *args, **kwargs)
-            # after function call, save db to file
-            dump(self.db, self.db_path.open(mode="wb"))
-            print(
-                "{}: {} caused database to be saved to disk.".format(
-                    self._current_dt, f.__name__
-                )
-            )
-            return result
+    @property
+    def associations(self):
 
-        return wrapper
+        # create needed data structures
+        result = {}
+        queue = SimpleQueue()
+        visited = set()
 
-    @_save_on_update
-    def add_collection(self, collection_name):
+        # for each collection
+        for collection in self.collections.values():
+            # add nodes in collection to queue
+            for node in collection.nodes.values():
+                queue.put(node)
+            # while there are nodes in the queue
+            while queue.qsize() > 0:
+                # dequeue a node
+                node = queue.get()
+                # if the node has not been visited
+                if node not in visited:
+                    # mark it as visited
+                    visited.add(node)
+                    # iterate over its relations
+                    for relation, label in node.relations.items():
+                        # add the relation to the queue
+                        queue.put(relation)
+                        # add the label to result
+                        if label in result:
+                            result[label].append((node, relation))
+                        else:
+                            result[label] = [(node, relation)]
+
+        # return the resulting dict or relations
+        return result
+
+    def add(self, collection_name):
+        """
+        Adds a collection to the database.
+        """
 
         # collection name must be at least 3 characters
         if len(collection_name) < 3:
@@ -62,95 +76,72 @@ class Database:
                 "collection name must be at least 3 characters in length"
             )
 
+        # collection must be a string
+        if not isinstance(collection_name, str):
+            raise Exception("collection name must be of type str")
+
         # collection must not already exist
-        if collection_name in self.db:
+        if collection_name in self.collections:
             raise Exception("collection already exists in database")
 
         # create the collection
-        self.db[collection_name] = Graph()
+        self.collections[collection_name] = Collection()
 
-    @_save_on_update
-    def remove_collection(self, collection_name):
+        # return the collection
+        return self.collections[collection_name]
 
-        # collection must exist in db
-        if collection_name not in self.db:
-            raise Exception(
-                "collection {} not found in database".format(collection_name)
-            )
-
-        # remove the collection
-        del self.db[collection_name]
-
-    @_save_on_update
-    def insert(self, collection_name, data):
-
-        # collection must exist in db
-        if collection_name not in self.db:
-            raise Exception(
-                "collection {} not found in database".format(collection_name)
-            )
-
-        # add vertex to graph
-        try:
-            result = self.db[collection_name].add_vertex(data)
-            print(
-                "{}: Entry inserted into collection {} with id {}".format(
-                    self._current_dt, collection_name, result.id
-                )
-            )
-            return result.to_dict()
-        except Exception as e:
-            raise e
-
-    def get(self, collection_name, query=None):
-
-        # collection must exist in db
-        if collection_name not in self.db:
-            raise Exception(
-                "collection {} not found in database".format(collection_name)
-            )
-
-        try:
-            # if query is string, find by id
-            if isinstance(query, str):
-                return (
-                    self.db[collection_name].get_vertex_by_id(query).to_dict()
-                )
-            # if query is None, return all vertices in collection as a list
-            if query is None:
-                return [
-                    vertex.to_dict()
-                    for vertex in self.db[collection_name].vertices.values()
-                ]
-
-        except Exception as e:
-            raise e
-
-    @_save_on_update
-    def associate(self, collection_name, id_1, id_2, label):
+    def insert(self, data):
         """
-        Add an edge associating one vertex to another. Label will be saved as
-        the weight of the edge.
+        Inserts a node into the database.
         """
 
-        # collection must exist in db
-        if collection_name not in self.db:
+        # data must be of type dict
+        if not isinstance(data, dict):
+            raise Exception("data must be of type dict")
+
+        # generate random uuid
+        uuid = uuid4().hex
+
+        # if the random uuid isn't so random (rare), try again until it is
+        if uuid in self.nodes:
+            while 1:
+                uuid = uuid4().hex
+                if uuid not in self.nodes:
+                    break
+
+        # insert the node into nodes
+        self.nodes[uuid] = Node(uuid, data)
+
+        # return the node
+        return self.nodes[uuid]
+
+    def remove(self, name, type=None):
+        """
+        Removes a collection or node from the database.
+        """
+
+        # name must exist in db
+        if name not in self.nodes or name not in self.collections:
             raise Exception(
-                "collection {} not found in database".format(collection_name)
+                f"name {name} not a node or collection in this database"
             )
 
-        # label must be at least 3 characters
-        if len(label) < 3:
-            raise Exception("label must be at least 3 characters in length")
+        # remove from database
+        if type is None:
+            if name in self.collections:
+                del self.collections[name]
+            if name in self.nodes:
+                del self.nodes[name]
+        elif type == "collection" and name in self.collections:
+            del self.collections[name]
+        elif type == "node" and name in self.nodes:
+            del self.nodes[name]
 
-        try:
-            # create edge from id_1 to id_2 (order matters)
-            self.db[collection_name].add_edge(id_1, id_2, label)
-            print(
-                """{}: The association with label {} has been created from {} 
-                     to {} in collection {}""".format(
-                    self._current_dt, label, id_1, id_2, collection_name
-                )
-            )
-        except Exception as e:
-            raise e
+    def wipe(self):
+        """
+        Deletes all collections and nodes in database.
+        """
+        for collection_name in self.collections:
+            self.remove(collection_name)
+        for node_name in self.nodes:
+            self.remove(node_name)
