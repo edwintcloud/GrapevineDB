@@ -5,11 +5,28 @@ from queue import SimpleQueue
 
 
 class Database:
+    """
+    Database represents the in-memory database object that will store
+    references to all data contained in the Database itself.
+    """
+
     def __init__(self):
+        """
+        Initialize a Database object.
+
+        Returns:
+            (Database): The initialized Database object.
+        """
         self.nodes = {}
         self.collections = {}
 
     def __str__(self):
+        """
+        Return the str representation of this Database.
+
+        Returns:
+            (str): The str representation of this Database.
+        """
         collections = [
             f"\n\t{k}: {{\n\t\t{str(v)}\n\t}}"
             for k, v in self.collections.items()
@@ -23,16 +40,35 @@ class Database:
 
     @property
     def num_nodes(self):
+        """
+        Return the number of nodes in this Database.
+
+        Returns:
+            (int): The number of nodes in this Database.
+        """
         return len(self.nodes) + sum(
             len(c.nodes) for c in self.collections.values()
         )
 
     @property
     def num_associations(self):
+        """
+        Return the number of associations in this Database.
+
+        Returns:
+            (int): The number of associations in this Database.
+        """
         return sum(len(i) for i in self.associations.values())
 
     @property
     def associations(self):
+        """
+        Return the associations in this Database.
+
+        Returns:
+            (dict): The associations in this Database organized by label as
+            the key and a list of edges (tuple of nodes) as the value.
+        """
 
         # create needed data structures
         result = {}
@@ -67,7 +103,19 @@ class Database:
 
     def add(self, collection_name):
         """
-        Adds a collection to the database.
+        Add a Collection to this Database by name.
+
+        Args:
+            collection_name (str): The name of the Collection to be created and
+            added to this Database.
+    
+        Returns:
+            (Collection): The newly created Collection.
+        
+        Raises:
+            Exception: If collection_name is less than 3 character in length.
+            Exception: If collection_name is not of type str.
+            Exception: If collection_name already exists in self.collections.
         """
 
         # collection name must be at least 3 characters
@@ -92,7 +140,17 @@ class Database:
 
     def insert(self, data):
         """
-        Inserts a node into the database.
+        Insert a Node into this Database.
+
+        Args:
+            data (dict): The data to be added to the new Node that will
+            be created and added to this Database.
+
+        Returns:
+            (Node): The newly created Node object.
+
+        Raises:
+            Exception: If data is not of type dict.
         """
 
         # data must be of type dict
@@ -117,7 +175,17 @@ class Database:
 
     def remove(self, name, type=None):
         """
-        Removes a collection or node from the database.
+        Remove a Collection or Node from this Database.
+
+        Args:
+            name (str): The name of the Collection or Node to be removed
+            from this Database.
+            type (str|None): Used to designate whether to remove a 'node', 
+            'collection', or None which will remove both by name if they
+            exist.
+
+        Raises:
+            Exception: If name is not a Node or Collection in this Database.
         """
 
         # name must exist in db
@@ -139,7 +207,7 @@ class Database:
 
     def wipe(self):
         """
-        Deletes all collections and nodes in database.
+        Delete all Collection(s) and Node(s) in this Database.
         """
         for collection_name in self.collections:
             self.remove(collection_name)

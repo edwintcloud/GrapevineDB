@@ -2,19 +2,29 @@ from node import Node
 from uuid import uuid4
 
 
-class Collection(object):
+class Collection:
+    """
+    A Collection is representative of a graph structure.
+    """
+
     def __init__(self):
         """
-        Initialize a graph object.
+        Initialize a Collection.
 
         Returns:
-            (Graph): The initialized graph object.
+            (Collection): The initialized Collection object.
         """
         self.nodes = {}
         self.num_nodes = 0
         self.num_labels = 0
 
     def __str__(self):
+        """
+        Return the str representation of this Collection.
+
+        Returns:
+            (str): The str representation of this Collection.
+        """
         nodes = [
             f"\n\t\t\t{k}: {{\n\t\t{str(v)}\n\t\t}}"
             for k, v in self.nodes.items()
@@ -23,13 +33,13 @@ class Collection(object):
 
     def insert(self, data):
         """
-        Insert an node into the collection
+        Insert an node into this collection.
 
         Args:
             data (dict): The data of the node to create.
 
         Returns:
-            (node): The node created.
+            (Node): The node created.
         """
 
         # data must be of type dict
