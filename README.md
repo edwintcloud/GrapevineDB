@@ -21,6 +21,8 @@ Here are the problems I wish to solve with this project:
 
 ## Usage
 
+A `sample_usage.py` file is provided as an example of how all of the methods on the database and subclasses work. Below are simplified explainations of important methods.
+
 - `db = Database()` -> Creates a Database object.
 - `db.add("users")` -> Adds users collection to the database. Returns a reference to the Collection.
 - `db.insert({"name": "basketball"})` -> Insert an arbitrary node with the specified data into the database. Returns a reference to the Node.
