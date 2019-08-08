@@ -14,6 +14,13 @@ Here are the problems I wish to solve with this project:
 2. Find the level of association for indirect associations in order to make determinations or reccomendations.
 3. Categorize differing data by common associations.
 
+## Future Todo
+
+- Add visualize method to database that will render figure of a specific collection.
+- Add a cli file that will serve as a command line interface/service for running the database and interacting with it.
+- Add a file persistent layer that will backup the in-memory structures as binary to disk on a consistent interval and before shutdown.
+- Add REST API
+
 ## Resources
 
 - https://en.wikipedia.org/wiki/Graph_database#/media/File:GraphDatabase_PropertyGraph.png
