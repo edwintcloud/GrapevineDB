@@ -1,6 +1,8 @@
-# RAG DB
+# GrapevineDB
 
-A graph theory project for a graph database.
+[![Build Status](https://travis-ci.com/edwintcloud/Grapevine_DB.svg?branch=master)](https://travis-ci.com/edwintcloud/Grapevine_DB)
+
+A simple object-oriented graph database in python. Easily find complex associations without the complex queries. ![alt text](./logo.png "Logo")
 
 ## Abstract
 
@@ -37,5 +39,5 @@ A `sample_usage.py` file is provided as an example of how all of the methods on 
 
 - Add visualize method to database that will render figure of a specific collection.
 - Add a cli file that will serve as a command line interface/service for running the database and interacting with it.
-- Add a file persistent layer that will backup the in-memory structures as binary to disk on a consistent interval and before shutdown.
-- Add REST API
+- Improve file persistence to be incremental.
+- Add REST API.

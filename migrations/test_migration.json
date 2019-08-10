@@ -1,0 +1,98 @@
+{
+  "collections": ["users"],
+  "nodes": [
+    {
+      "key": "Apple",
+      "data": { "Name": "Apple", "Category": "Technology" }
+    },
+    {
+      "key": "The Beatles",
+      "data": { "Name": "The Beatles", "Category": "Musician/Band" }
+    },
+    {
+      "key": "Coca-Cola",
+      "data": { "Name": "Coca-Cola", "Category": "Food/Drink" }
+    },
+    {
+      "key": "Mary",
+      "data": { "Name": "Mary", "Gender": "F", "Age": "26" },
+      "belongs_to": "users"
+    },
+    {
+      "key": "Francis",
+      "data": { "Name": "Francis", "Gender": "F", "Age": "31" },
+      "belongs_to": "users"
+    },
+    {
+      "key": "John",
+      "data": { "Name": "John", "Gender": "M", "Age": "28" },
+      "belongs_to": "users"
+    }
+  ],
+  "relations": [
+    {
+      "from": {
+        "key": "Mary",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "John",
+        "belongs_to": "users"
+      },
+      "by": "FRIENDS_WITH",
+      "bidirectional": true
+    },
+    {
+      "from": {
+        "key": "Mary",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "Francis",
+        "belongs_to": "users"
+      },
+      "by": "FRIENDS_WITH",
+      "bidirectional": true
+    },
+    {
+      "from": {
+        "key": "Mary",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "Apple"
+      },
+      "by": "LIKES"
+    },
+    {
+      "from": {
+        "key": "John",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "Coca-Cola"
+      },
+      "by": "LIKES"
+    },
+    {
+      "from": {
+        "key": "John",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "The Beatles"
+      },
+      "by": "LIKES"
+    },
+    {
+      "from": {
+        "key": "Francis",
+        "belongs_to": "users"
+      },
+      "to": {
+        "key": "The Beatles"
+      },
+      "by": "LIKES"
+    }
+  ]
+}

@@ -1,12 +1,13 @@
 from queue import SimpleQueue
+from file_ops import FileOps
 
 
-class Node:
+class Node(FileOps):
     """
     A node is representative of the vertices in a graph.
     """
 
-    def __init__(self, uuid, data):
+    def __init__(self, uuid, data, file):
         """
         Initialize a Node object with uuid and data.
 
@@ -20,6 +21,7 @@ class Node:
         self.id = uuid
         self.data = data
         self.relations = {}
+        self.file = file
 
     def __str__(self):
         """
@@ -41,6 +43,7 @@ class Node:
         """
         return {"id": self.id, "data": self.data, "relations": self.relations}
 
+    @FileOps.save_on_update
     def relate_to(self, node, by=None, bidirectional=False):
         """
         Create a relation between this Node and another Node object.
