@@ -6,6 +6,8 @@ A simple object-oriented graph database in python. Easily find complex associati
 
 ## Abstract
 
+[Presentation Slides](https://docs.google.com/presentation/d/1BnO2CQCkF0JLeR8JiAvMzBEoLBTMNgWj7qXTj1n8Nqs/edit?usp=sharing)
+
 Finding indirect relationships is not an easy or typical usage for traditional databases. A graph database is designed in such a way that makes finding indirect associations for applications such as a social network or reccomendation engine much more efficient and easy. Below is a great photo from Nicolle Cysneiros Blog Post about Graph Databases on Medium to display the typical structure which I will be modeling:
 
 ![alt text](https://miro.medium.com/max/700/1*3BvGbuFSHeLUihVXAAaNdw.png "Social Network scenario represented as a graph")

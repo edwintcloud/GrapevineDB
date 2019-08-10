@@ -121,7 +121,7 @@ class Node(FileOps):
         # if stack is empty, no direct relation by label_1 exists,
         # return empty list
         if len(stack) == 0:
-            return []
+            return {}
 
         # create needed structures
         result = {}

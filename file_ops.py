@@ -67,11 +67,11 @@ class FileOps:
                 self.file.collections,
                 self.file.collections_path.open(mode="wb"),
             )
-            print(
-                "{}: {}.{} caused database to be saved to disk.".format(
-                    self.current_dt, type(self).__name__, f.__name__
-                )
-            )
+            # print(
+            #     "{}: {}.{} caused database to be saved to disk.".format(
+            #         self.current_dt, type(self).__name__, f.__name__
+            #     )
+            # )
             return result
 
         return wrapper
