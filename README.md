@@ -1,4 +1,4 @@
-# GrapevineDB [![Build Status](https://travis-ci.com/edwintcloud/Grapevine_DB.svg?branch=master)](https://travis-ci.com/edwintcloud/Grapevine_DB)
+# GrapevineDB [![Build Status](https://travis-ci.com/edwintcloud/GrapevineDB.svg?branch=master)](https://travis-ci.com/edwintcloud/GrapevineDB)
 
 A simple object-oriented graph database in python. Easily find complex associations without the complex queries.
 
